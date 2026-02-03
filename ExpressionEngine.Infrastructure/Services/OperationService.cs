@@ -3,6 +3,7 @@ using ExpressionEngine.Core.Models;
 using ExpressionEngine.Infrastructure.Engines;
 using ExpressionEngine.Shared.DTOs;
 using ExpressionEngine.Shared.Enums;
+using System;
 
 public sealed class OperationService : IOperationService
 {
@@ -22,18 +23,14 @@ public sealed class OperationService : IOperationService
 
     public async Task<CalculateResultDto> ExecuteAsync(CalculateRequestDto request)
     {
-        var operation = await _repo.GetByIdAsync(request.OperationId);
-
-        if (operation is null)
-            throw new ArgumentException("Operation not found", nameof(request.OperationId));
-
-        double a, b;
+        var operation = await _repo.GetByIdAsync(request.OperationId) 
+            ?? throw new ArgumentException("Operation not found", nameof(request.OperationId));
         string result;
 
         if (operation.OperationType == OperationType.Numeric)
         {
-            if (double.TryParse(request.ValueA, out a) &&
-                double.TryParse(request.ValueB, out b))
+            if (double.TryParse(request.ValueA, out double a) &&
+                double.TryParse(request.ValueB, out double b))
             {
                 result = NumericExpressionEngine.Calculate(operation.Expression, a, b);
 
@@ -83,7 +80,7 @@ public sealed class OperationService : IOperationService
 
         return new CalculateResultDto(
             result,
-            last3.Select(h => new OperationHistoryDto(h.A, h.B, h.Result)).ToList(),
+            [.. last3.Select(h => new OperationHistoryDto(h.A, h.B, h.Result))],
             count);
     }
 }
