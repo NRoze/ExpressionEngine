@@ -2,30 +2,30 @@
 @using ExpressionEngine.Shared.DTOs
 @inject HttpClient Http
 
-<h3>Calculator</h3>
+<h3>Expression Engine</h3>
+<div>
+    <InputText @bind-Value="InputA" placeholder="Field 1" style="width:100px;"/>
 
-<div style="display:flex; flex-direction:column; gap:10px; width:400px;">
-
-    <InputText @bind-Value="InputA" placeholder="Input 1" />
-
-    <select @bind="SelectedOperationId">
+    <select @bind="SelectedOperationId" style="width:120px;">
         @foreach (var op in Operations)
         {
             <option value="@op.Id">@op.Name</option>
         }
     </select>
 
-    <InputText @bind-Value="InputB" placeholder="Input 2" />
+    <InputText @bind-Value="InputB" placeholder="Field 2" style="width:100px;" />
 
-    <button @onclick="Calculate">Calculate</button>
+    <button @onclick="Calculate" style="width:100px;">Calculate</button>
 
     @if (!string.IsNullOrEmpty(Error))
     {
         <div style="color:red">@Error</div>
     }
-
-    <textarea rows="4" readonly>@Result</textarea>
-
+</div>
+<div>
+    <textarea rows="4" readonly style="width:445px; margin-top:20px;">@Result</textarea>
+</div>
+<div style="width:420px;">
     @if (History.Any())
     {
         <h4>Last 3 operations (same type)</h4>
@@ -46,10 +46,10 @@
 </div>
 
 @code {
-    string InputA;
-    string InputB;
-    string Result;
-    string Error;
+    string InputA = default!;
+    string InputB = default!;
+    string Result = default!;
+    string Error = default!;
 
     int SelectedOperationId;
 
@@ -59,15 +59,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Operations = await Http.GetFromJsonAsync<List<OperationDto>>("api/operations");
+        Operations = await Http.GetFromJsonAsync<List<OperationDto>>("api/operations")
+                        ?? default!;
+
         if (Operations.Any())
             SelectedOperationId = Operations.First().Id;
     }
 
     async Task Calculate()
     {
-        Error = null;
-        Result = null;
+        Error = default!;
+        Result = default!;
+        TotalCount = default!;
+        History.Clear();
 
         try
         {
@@ -81,14 +85,21 @@
             if (!response.IsSuccessStatusCode)
             {
                 Error = await response.Content.ReadAsStringAsync();
+                Result = default!;
+                TotalCount = default!;
+                History.Clear();
+
                 return;
             }
 
             var calcResult = await response.Content.ReadFromJsonAsync<CalculateResultDto>();
-            Result = calcResult.Result;
 
-            History = calcResult.LastOperations;
-            TotalCount = calcResult.TotalCount;
+            if (calcResult is not null)
+            {
+                Result = calcResult.Result;
+                History = calcResult.LastOperations;
+                TotalCount = calcResult.TotalCount;
+            }
         }
         catch (Exception ex)
         {

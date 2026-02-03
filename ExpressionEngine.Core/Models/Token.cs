@@ -1,4 +1,4 @@
-﻿using ExpressionEngine.Core.Enums;
+﻿using ExpressionEngine.Shared.Enums;
 
 namespace ExpressionEngine.Core.Models
 {

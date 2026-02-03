@@ -1,17 +1,21 @@
-﻿using ExpressionEngine.Core.Enums;
-using ExpressionEngine.Core.Interfaces;
+﻿using ExpressionEngine.Core.Interfaces;
 using ExpressionEngine.Core.Models;
 using ExpressionEngine.Infrastructure.Engines;
 using ExpressionEngine.Shared.DTOs;
-using System.ClientModel.Primitives;
+using ExpressionEngine.Shared.Enums;
 
 public sealed class OperationService : IOperationService
 {
+    private readonly IDateProvider _dateProvider;
     private readonly IRepository<Operation> _repo;
     private readonly IRepository<OperationHistory> _historyRepo;
 
-    public OperationService(IRepository<Operation> repo, IRepository<OperationHistory> historyRepo)
+    public OperationService(
+        IDateProvider dateProvider,
+        IRepository<Operation> repo, 
+        IRepository<OperationHistory> historyRepo)
     {
+        _dateProvider = dateProvider;
         _repo = repo;
         _historyRepo = historyRepo;
     }
@@ -36,7 +40,9 @@ public sealed class OperationService : IOperationService
                 if (string.IsNullOrEmpty(result))
                     throw new InvalidOperationException("Failed to calculate the expression.");
 
-                return await BuildResultDTO(request.OperationId, result);
+                await LogOperationUsage(operation.Id, request, result);
+
+                return await BuildResultDTO(operation.Id, result);
             }
             
             throw new ArgumentException("Invalid numeric values", nameof(request));
@@ -44,22 +50,40 @@ public sealed class OperationService : IOperationService
 
         result = StringExpressionEngine.Calculate(operation.Expression, request.ValueA, request.ValueB);
 
-        return await BuildResultDTO(request.OperationId, result);
+        await LogOperationUsage(operation.Id, request, result);
+
+        return await BuildResultDTO(operation.Id, result);
+    }
+
+    private async Task LogOperationUsage(int operationId, CalculateRequestDto request, string result)
+    {
+        await _historyRepo.AddAsync(new OperationHistory
+        {
+            OperationId = operationId,
+            A = request.ValueA,
+            B = request.ValueB,
+            Result = result,
+            ExecutedAt = _dateProvider.UtcNow
+        });
     }
 
     private async Task<CalculateResultDto> BuildResultDTO(int operationId, string result)
     {
-        var history = await _historyRepo.GetAllAsync();
-        var sameOperationHistory = history.Where(h => h.Id == operationId).ToList();
-        var thisMonthHistory = sameOperationHistory.Where(
-            h => 
-                h.ExecutedAt.Year == DateTime.UtcNow.Year &&
-                h.ExecutedAt.Month == DateTime.UtcNow.Month).ToList();
-        var count = sameOperationHistory.Count;
+        var dateNow = _dateProvider.UtcNow;
+        var history = await _historyRepo.GetAllAsync();//TODO optimize to fetch only relevant records
+        var thisMonthHistory = history
+            .Where(h => 
+                h.OperationId == operationId &&
+                h.ExecutedAt.Year == dateNow.Year &&
+                h.ExecutedAt.Month == dateNow.Month)
+            .OrderByDescending(h => h.ExecutedAt)
+            .ToList();
+        var last3 = thisMonthHistory.Take(3);
+        var count = thisMonthHistory.Count;
 
         return new CalculateResultDto(
-            result, 
-            thisMonthHistory.Select(h => new OperationHistoryDto(h.A, h.B, h.Result)).ToList(), 
+            result,
+            last3.Select(h => new OperationHistoryDto(h.A, h.B, h.Result)).ToList(),
             count);
     }
 }

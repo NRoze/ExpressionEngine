@@ -1,4 +1,4 @@
-﻿namespace ExpressionEngine.Core.Enums
+﻿namespace ExpressionEngine.Shared.Enums
 {
     public enum OperationType
     {

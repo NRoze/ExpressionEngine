@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ExpressionEngine.Core.Enums
+﻿namespace ExpressionEngine.Shared.Enums
 {
     public enum TokenType
     {

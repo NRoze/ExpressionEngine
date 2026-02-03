@@ -4,6 +4,7 @@ using ExpressionEngine.Api.Interfaces;
 using ExpressionEngine.Core.Interfaces;
 using ExpressionEngine.Infrastructure.Data;
 using ExpressionEngine.Infrastructure.Repositores;
+using ExpressionEngine.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,9 +19,9 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 var MyAllowOrigins = "_myAllowOrigins";
 builder.AddCors(MyAllowOrigins);
 
+builder.Services.AddSingleton<IDateProvider, DateProvider>();
 builder.Services.AddScoped<IEndpointDefinition, OperationEndpoints>();
 builder.Services.AddScoped<IOperationService, OperationService>();
-
 var app = builder.Build();
 
 app.UseCors(MyAllowOrigins);
