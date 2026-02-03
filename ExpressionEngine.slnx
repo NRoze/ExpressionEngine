@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="ExpressionEngine.Core/ExpressionEngine.Core.csproj" />
+  <Project Path="ExpressionEngine.Infrastructure/ExpressionEngine.Infrastructure.csproj" />
+  <Project Path="ExpressionEngine.Shared/ExpressionEngine.Shared.csproj" />
+  <Project Path="ExpressionEngine.UI/ExpressionEngine.UI.csproj" />
+  <Project Path="ExpressionEngine/ExpressionEngine.Api.csproj" />
+</Solution>
