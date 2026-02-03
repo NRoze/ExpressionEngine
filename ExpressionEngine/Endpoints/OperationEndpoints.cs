@@ -26,7 +26,7 @@ namespace ExpressionEngine.Api.Endpoints
 
         private async Task<IResult> CalculateOperation(
             IOperationService operationService,
-            CalculateRequest request)
+            CalculateRequestDto request)
         {
             try
             {

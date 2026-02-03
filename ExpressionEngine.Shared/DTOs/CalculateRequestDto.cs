@@ -4,5 +4,5 @@ using System.Text;
 
 namespace ExpressionEngine.Shared.DTOs
 {
-    public record CalculateRequest(int OperationId, string ValueA, string ValueB);
+    public record CalculateRequestDto(int OperationId, string ValueA, string ValueB);
 }

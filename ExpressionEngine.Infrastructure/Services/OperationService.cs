@@ -16,7 +16,7 @@ public sealed class OperationService : IOperationService
         _historyRepo = historyRepo;
     }
 
-    public async Task<CalculateResultDto> ExecuteAsync(CalculateRequest request)
+    public async Task<CalculateResultDto> ExecuteAsync(CalculateRequestDto request)
     {
         var operation = await _repo.GetByIdAsync(request.OperationId);
 
