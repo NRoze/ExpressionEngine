@@ -1,7 +1,98 @@
 ﻿@page "/"
+@using ExpressionEngine.Shared.DTOs
+@inject HttpClient Http
 
-<PageTitle>Home</PageTitle>
+<h3>Calculator</h3>
 
-<h1>Hello, world!</h1>
+<div style="display:flex; flex-direction:column; gap:10px; width:400px;">
 
-Welcome to your new app.
+    <InputText @bind-Value="InputA" placeholder="Input 1" />
+
+    <select @bind="SelectedOperationId">
+        @foreach (var op in Operations)
+        {
+            <option value="@op.Id">@op.Name</option>
+        }
+    </select>
+
+    <InputText @bind-Value="InputB" placeholder="Input 2" />
+
+    <button @onclick="Calculate">Calculate</button>
+
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <div style="color:red">@Error</div>
+    }
+
+    <textarea rows="4" readonly>@Result</textarea>
+
+    @if (History.Any())
+    {
+        <h4>Last 3 operations (same type)</h4>
+        <ul>
+            @foreach (var h in History)
+            {
+                <li>
+                    @h.ValueA , @h.ValueB → @h.Result
+                </li>
+            }
+        </ul>
+
+        <div>
+            Total count: @TotalCount
+        </div>
+    }
+
+</div>
+
+@code {
+    string InputA;
+    string InputB;
+    string Result;
+    string Error;
+
+    int SelectedOperationId;
+
+    List<OperationDto> Operations = new();
+    List<OperationHistoryDto> History = new();
+    int TotalCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Operations = await Http.GetFromJsonAsync<List<OperationDto>>("api/operations");
+        if (Operations.Any())
+            SelectedOperationId = Operations.First().Id;
+    }
+
+    async Task Calculate()
+    {
+        Error = null;
+        Result = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/calculate", new
+            {
+                OperationId = SelectedOperationId,
+                ValueA = InputA,
+                ValueB = InputB
+            });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Error = await response.Content.ReadAsStringAsync();
+                return;
+            }
+
+            var calcResult = await response.Content.ReadFromJsonAsync<CalculateResultDto>();
+            Result = calcResult.Result;
+
+            History = calcResult.LastOperations;
+            TotalCount = calcResult.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+    }
+}

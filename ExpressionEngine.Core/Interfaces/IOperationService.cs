@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ExpressionEngine.Shared.DTOs;
 
 namespace ExpressionEngine.Core.Interfaces
 {
-    //public interface IOperationService
-    //{
-    //    Task<OperationResult> ExecuteAsync(int operationId, string a, string b);
-    //}
+    public interface IOperationService
+    {
+        Task<CalculateResultDto> ExecuteAsync(CalculateRequest request);
+    }
 }
