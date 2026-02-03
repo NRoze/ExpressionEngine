@@ -1,8 +1,8 @@
 ﻿namespace ExpressionEngine.Core.Enums
 {
-    public enum OperationCategory
+    public enum OperationType
     {
-        NumericOnly,
-        NumericAndString
+        Numeric,
+        String
     }
 }

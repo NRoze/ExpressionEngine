@@ -24,16 +24,16 @@ namespace ExpressionEngine.Infrastructure.Data
             });
 
             modelBuilder.Entity<Operation>().HasData(
-                new Operation { Id = 1, Name = "Add", Expression = "A + B" },
-                new Operation { Id = 2, Name = "Subtract", Expression = "A - B" },
-                new Operation { Id = 3, Name = "Multiply", Expression = "A * B" },
-                new Operation { Id = 4, Name = "Divide", Expression = "A / B" },
-                new Operation { Id = 5, Name = "Modulo", Expression = "A % B" },
-                new Operation { Id = 6, Name = "Min", Expression = "min(A,B)" },
-                new Operation { Id = 7, Name = "Max", Expression = "max(A,B)" },
-                new Operation { Id = 8, Name = "Concat", Expression = "A + B" },
-                new Operation { Id = 9, Name = "Remove", Expression = "A - B" },
-                new Operation { Id = 10, Name = "Repeat", Expression = "A * B" }
+                new Operation { Id = 1, Name = "Add", Expression = "A + B", OperationType = OperationType.Numeric },
+                new Operation { Id = 2, Name = "Subtract", Expression = "A - B", OperationType = OperationType.Numeric },
+                new Operation { Id = 3, Name = "Multiply", Expression = "A * B", OperationType = OperationType.Numeric },
+                new Operation { Id = 4, Name = "Divide", Expression = "A / B", OperationType = OperationType.Numeric },
+                new Operation { Id = 5, Name = "Modulo", Expression = "A % B", OperationType = OperationType.Numeric },
+                new Operation { Id = 6, Name = "Min", Expression = "min(A,B)", OperationType = OperationType.Numeric },
+                new Operation { Id = 7, Name = "Max", Expression = "max(A,B)", OperationType = OperationType.Numeric },
+                new Operation { Id = 8, Name = "Concat", Expression = "A + B", OperationType = OperationType.String },
+                new Operation { Id = 9, Name = "Remove", Expression = "A - B", OperationType = OperationType.String },
+                new Operation { Id = 10, Name = "Repeat", Expression = "A * B", OperationType = OperationType.String }
             );
 
             modelBuilder.Entity<Operator>(entity =>
@@ -44,13 +44,13 @@ namespace ExpressionEngine.Infrastructure.Data
             });
 
             modelBuilder.Entity<Operator>().HasData(
-                new Operator { Id = 1, Name = "Add", Symbol = "+", Category = OperationCategory.NumericAndString },
-                new Operator { Id = 2, Name = "Subtract", Symbol = "-", Category = OperationCategory.NumericAndString },
-                new Operator { Id = 3, Name = "Multiply", Symbol = "*", Category = OperationCategory.NumericAndString },
-                new Operator { Id = 4, Name = "Divide", Symbol = "/", Category = OperationCategory.NumericOnly },
-                new Operator { Id = 5, Name = "Modulo", Symbol = "%", Category = OperationCategory.NumericOnly },
-                new Operator { Id = 6, Name = "Min", Symbol = "min", Category = OperationCategory.NumericOnly },
-                new Operator { Id = 7, Name = "Max", Symbol = "max", Category = OperationCategory.NumericOnly }
+                new Operator { Id = 1, Name = "Add", Symbol = "+", Category = OperatorType.NumericAndString },
+                new Operator { Id = 2, Name = "Subtract", Symbol = "-", Category = OperatorType.NumericAndString },
+                new Operator { Id = 3, Name = "Multiply", Symbol = "*", Category = OperatorType.NumericAndString },
+                new Operator { Id = 4, Name = "Divide", Symbol = "/", Category = OperatorType.NumericOnly },
+                new Operator { Id = 5, Name = "Modulo", Symbol = "%", Category = OperatorType.NumericOnly },
+                new Operator { Id = 6, Name = "Min", Symbol = "min", Category = OperatorType.NumericOnly },
+                new Operator { Id = 7, Name = "Max", Symbol = "max", Category = OperatorType.NumericOnly }
             );
             modelBuilder.Entity<Token>(entity =>
             {
