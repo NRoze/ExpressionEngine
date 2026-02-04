@@ -3,6 +3,7 @@ using ExpressionEngine.Core.Interfaces;
 using ExpressionEngine.Core.Models;
 using ExpressionEngine.Shared.DTOs;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ExpressionEngine.Api.Endpoints
 {
@@ -14,6 +15,7 @@ namespace ExpressionEngine.Api.Endpoints
             app.MapGet("/api/operations", GetOperations);
             app.MapPost("/api/operations", CreateOperation);
             app.MapPut("/api/operations", UpdateOperation);
+            app.MapDelete("/api/operations/{operationId}", DeleteOperation);
         }
 
         private async Task<IResult> CreateOperation(
@@ -50,6 +52,7 @@ namespace ExpressionEngine.Api.Endpoints
             }
 
         }
+
         private async Task<IResult> UpdateOperation(
             ILogger<OperationEndpoints> logger,
             IValidator<UpdateOperationDto> validator,
@@ -66,7 +69,7 @@ namespace ExpressionEngine.Api.Endpoints
                 request.Type = operation.OperationType;
                 if (!(await validator.ValidateAsync(request)).IsValid)
                     return Results.BadRequest("Invalid request");
-                
+
                 operation.Expression = request.Expression;
 
                 await repo.UpdateAsync(operation);
@@ -82,6 +85,29 @@ namespace ExpressionEngine.Api.Endpoints
                     request.Expression);
 
                 return Results.BadRequest($"Failed to updtae {operation.Name} operation");
+            }
+        }
+
+        private async Task<IResult> DeleteOperation(
+            ILogger<OperationEndpoints> logger,
+            IValidator<DeleteOperationDto> validator,
+            IRepository<Operation> repo,
+            int operationId)
+        {
+            try
+            {
+                await repo.DeleteAsync(operationId);
+
+                return Results.NoContent();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "Error deleting operation id {OperationId}",
+                    operationId);
+
+                return Results.BadRequest($"Failed to delete operation id {operationId} ");
             }
         }
 

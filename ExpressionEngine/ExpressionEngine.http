@@ -88,3 +88,8 @@ Content-Type: application/json
   "operationId": "21",
   "expression": "A / (B - B)"
 }
+
+###
+
+### Delete valid operation 1
+DELETE {{ExpressionEngine_HostAddress}}/api/operations/21
