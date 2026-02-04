@@ -1,6 +1,79 @@
-@ExpressionEngine_HostAddress = http://localhost:5132
+@ExpressionEngine_HostAddress = https://localhost:7139
 
-GET {{ExpressionEngine_HostAddress}}/weatherforecast/
+### Get operations
+GET {{ExpressionEngine_HostAddress}}/api/operations
 Accept: application/json
 
 ###
+
+### Calculate
+POST {{ExpressionEngine_HostAddress}}/api/calculate
+Content-Type: application/json
+
+{
+  "operationId": 21,
+  "valueA": "2",
+  "valueB": "3"
+}
+
+###
+
+### Create valid operation 1
+POST {{ExpressionEngine_HostAddress}}/api/operations
+Content-Type: application/json
+
+{
+  "name": "Test1",
+  "expression": "A / (B - B)",
+  "type": 0
+}
+
+### Create invalid operation 2
+POST {{ExpressionEngine_HostAddress}}/api/operations
+Content-Type: application/json
+
+{
+  "name": "Test2",
+  "expression": "A ++ B",
+  "type": 0
+}
+
+### Create invalid operation 3
+POST {{ExpressionEngine_HostAddress}}/api/operations
+Content-Type: application/json
+
+{
+  "name": "Test3",
+  "expression": "(A + B",
+  "type": 0
+}
+
+### Create invalid operation 4
+POST {{ExpressionEngine_HostAddress}}/api/operations
+Content-Type: application/json
+
+{
+  "name": "Test4",
+  "expression": "A / B",
+  "type": 1
+}
+
+### Create invalid operation 5
+POST {{ExpressionEngine_HostAddress}}/api/operations
+Content-Type: application/json
+
+{
+  "name": "Test5",
+  "expression": "A ++ B",
+  "type": 1
+}
+
+### Create nvalid operation 6
+POST {{ExpressionEngine_HostAddress}}/api/operations
+Content-Type: application/json
+
+{
+  "name": "Test6",
+  "expression": "min(A,B)",
+  "type": 0
+}

@@ -5,6 +5,7 @@
         Variable,
         Operator,
         Function,
-        Parenthesis
+        Parenthesis,
+        Separator
     }
 }

@@ -101,9 +101,9 @@
                 TotalCount = calcResult.TotalCount;
             }
         }
-        catch (Exception ex)
+        catch
         {
-            Error = ex.Message;
+            Error = "An unexpected error occurred. Please try again.";
         }
     }
 }

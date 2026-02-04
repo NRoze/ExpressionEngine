@@ -5,7 +5,11 @@ using ExpressionEngine.Core.Interfaces;
 using ExpressionEngine.Infrastructure.Data;
 using ExpressionEngine.Infrastructure.Repositores;
 using ExpressionEngine.Infrastructure.Services;
+using ExpressionEngine.Infrastructure.Validators;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+
+//TODO add test units
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,14 +18,18 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-
 var MyAllowOrigins = "_myAllowOrigins";
 builder.AddCors(MyAllowOrigins);
 
-builder.Services.AddSingleton<IDateProvider, DateProvider>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddScoped<IDateProvider, DateProvider>();
+builder.Services.AddScoped<IExpressionValidator, ExpressionValidator>();
+builder.Services.AddScoped<IExpressionTokensValidator, ExpressionTokensValidator>();
+builder.Services.AddScoped<IExpressionFormatValidator, ExpressionFormatValidator>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 builder.Services.AddScoped<IEndpointDefinition, OperationEndpoints>();
 builder.Services.AddScoped<IOperationService, OperationService>();
+
 var app = builder.Build();
 
 app.UseCors(MyAllowOrigins);

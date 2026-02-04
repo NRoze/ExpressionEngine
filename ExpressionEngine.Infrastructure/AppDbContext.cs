@@ -80,7 +80,10 @@ namespace ExpressionEngine.Infrastructure.Data
 
                 // Functions
                 new Token { Id = 10, Symbol = "min", Type = TokenType.Function },
-                new Token { Id = 11, Symbol = "max", Type = TokenType.Function }
+                new Token { Id = 11, Symbol = "max", Type = TokenType.Function },
+
+                // Separators
+                new Token { Id = 12, Symbol = ",", Type = TokenType.Separator }
             );
 
             modelBuilder.Entity<OperationHistory>(entity =>
