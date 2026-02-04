@@ -4,15 +4,12 @@ using FluentValidation;
 
 namespace ExpressionEngine.Api.Validators
 {
-    public class CreateOperationValidator : AbstractValidator<CreateOperationDto>
+    public class UpdateOperationValidator : AbstractValidator<UpdateOperationDto>
     {
-        public CreateOperationValidator(IExpressionValidator expressionValidator)
+        public UpdateOperationValidator(IExpressionValidator expressionValidator)
         {
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Name is required")
-                .MaximumLength(100)
-                .WithMessage("Name cannot exceed 100 characters");
+            RuleFor(x => x.OperationId)
+                .GreaterThanOrEqualTo(0);
 
             RuleFor(x => x.Expression)
                 .NotEmpty()

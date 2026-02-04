@@ -13,6 +13,7 @@ namespace ExpressionEngine.Api.Endpoints
             app.MapPost("/api/calculate", CalculateOperation);
             app.MapGet("/api/operations", GetOperations);
             app.MapPost("/api/operations", CreateOperation);
+            app.MapPut("/api/operations", UpdateOperation);
         }
 
         private async Task<IResult> CreateOperation(
@@ -48,6 +49,40 @@ namespace ExpressionEngine.Api.Endpoints
                 return Results.BadRequest($"Failed to create {request.Name} operation");
             }
 
+        }
+        private async Task<IResult> UpdateOperation(
+            ILogger<OperationEndpoints> logger,
+            IValidator<UpdateOperationDto> validator,
+            IRepository<Operation> repo,
+            UpdateOperationDto request)
+        {
+            var operation = await repo.GetByIdAsync(request.OperationId);
+
+            if (operation is null)
+                return Results.NotFound($"Operation with ID {request.OperationId} not found");
+
+            try
+            {
+                request.Type = operation.OperationType;
+                if (!(await validator.ValidateAsync(request)).IsValid)
+                    return Results.BadRequest("Invalid request");
+                
+                operation.Expression = request.Expression;
+
+                await repo.UpdateAsync(operation);
+
+                return Results.NoContent();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "Error updating operation {OperationName}: {OperationExpression}",
+                    operation.Name,
+                    request.Expression);
+
+                return Results.BadRequest($"Failed to updtae {operation.Name} operation");
+            }
         }
 
         private async Task<IResult> GetOperations(IRepository<Operation> repo)

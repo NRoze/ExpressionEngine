@@ -11,7 +11,7 @@ POST {{ExpressionEngine_HostAddress}}/api/calculate
 Content-Type: application/json
 
 {
-  "operationId": 21,
+  "operationId": 1,
   "valueA": "2",
   "valueB": "3"
 }
@@ -76,4 +76,15 @@ Content-Type: application/json
   "name": "Test6",
   "expression": "min(A,B)",
   "type": 0
+}
+
+###
+
+### Update valid operation 1
+PUT {{ExpressionEngine_HostAddress}}/api/operations
+Content-Type: application/json
+
+{
+  "operationId": "21",
+  "expression": "A / (B - B)"
 }
