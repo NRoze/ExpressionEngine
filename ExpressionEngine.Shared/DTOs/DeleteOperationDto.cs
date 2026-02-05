@@ -1,4 +1,4 @@
 ﻿namespace ExpressionEngine.Shared.DTOs
 {
-    public record DeleteOperationDto(int OperationId);
+    public record DeleteOperationDto(Guid OperationId);
 }

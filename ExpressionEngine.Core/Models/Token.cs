@@ -4,8 +4,8 @@ namespace ExpressionEngine.Core.Models
 {
     public class Token
     {
-        public int Id { get; set; }
-        public string Symbol { get; set; } = null!;
-        public TokenType Type { get; set; }
+        public int Id { get; init; }
+        public string Symbol { get; init; } = default!;
+        public TokenType Type { get; init; }
     }
 }

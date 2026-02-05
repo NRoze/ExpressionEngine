@@ -14,7 +14,7 @@ namespace ExpressionEngine.Api.Endpoints
             app.MapGet("/api/operations", GetOperations);
             app.MapPost("/api/operations", CreateOperation);
             app.MapPut("/api/operations", UpdateOperation);
-            app.MapDelete("/api/operations/{operationId}", DeleteOperation);
+            app.MapDelete("/api/operations/{operationId:guid}", DeleteOperation);
         }
 
         private async Task<IResult> CreateOperation(
@@ -28,12 +28,7 @@ namespace ExpressionEngine.Api.Endpoints
                 if (!(await validator.ValidateAsync(request)).IsValid)
                     return Results.BadRequest("Invalid request");
 
-                var operation = new Operation
-                {
-                    Name = request.Name,
-                    Expression = request.Expression,
-                    OperationType = request.Type
-                };
+                var operation = new Operation(request.Name, request.Expression, request.Type);
 
                 await repo.AddAsync(operation);
 
@@ -68,7 +63,7 @@ namespace ExpressionEngine.Api.Endpoints
                 if (!(await validator.ValidateAsync(request)).IsValid)
                     return Results.BadRequest("Invalid request");
 
-                operation.Expression = request.Expression;
+                operation.UpdateExpression(request.Expression);
 
                 await repo.UpdateAsync(operation);
 
@@ -90,7 +85,7 @@ namespace ExpressionEngine.Api.Endpoints
             ILogger<OperationEndpoints> logger,
             IValidator<DeleteOperationDto> validator,
             IRepository<Operation> repo,
-            int operationId)
+            Guid operationId)
         {
             try
             {

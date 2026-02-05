@@ -48,13 +48,12 @@ public class OperationEndpointsIntegrationTests :
 
         body.Should().NotBeNull();
         body!.Name.Should().Be(name);
-        body.Id.Should().BeGreaterThan(0);
     }
 
     [Fact]
     public async Task UpdateOperation_NotFound_ReturnsNotFound()
     {
-        var dto = new UpdateOperationDto(999, "new expr");
+        var dto = new UpdateOperationDto(Guid.NewGuid(), "new expr");
 
         var response = await _client.PutAsJsonAsync("/api/operations", dto);
 
@@ -77,7 +76,7 @@ public class OperationEndpointsIntegrationTests :
     [Fact]
     public async Task CalculateOperation_InvalidModel_ReturnsBadRequest()
     {
-        var dto = new CalculateRequestDto(1, "", "");
+        var dto = new CalculateRequestDto(Guid.CreateVersion7(), "", "");
 
         var response = await _client.PostAsJsonAsync("/api/calculate", dto);
 

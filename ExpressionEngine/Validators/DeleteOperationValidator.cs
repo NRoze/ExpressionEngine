@@ -9,7 +9,7 @@ namespace ExpressionEngine.Api.Validators
         public DeleteOperationValidator(IExpressionValidator expressionValidator)
         {
             RuleFor(x => x.OperationId)
-                .GreaterThanOrEqualTo(0);
+                .NotNull();
         }
     }
 }

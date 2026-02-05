@@ -1,6 +1,4 @@
-﻿using System;
-using Xunit;
-using ExpressionEngine.Infrastructure.Engines;
+﻿using ExpressionEngine.Infrastructure.Engines;
 
 namespace ExpressionEngine.UnitTests.Handlers
 {

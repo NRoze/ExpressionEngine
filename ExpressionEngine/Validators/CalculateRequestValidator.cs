@@ -8,7 +8,7 @@ namespace ExpressionEngine.Api.Validators
         public CalculateRequestValidator()
         {
             RuleFor(x => x.OperationId)
-                .GreaterThanOrEqualTo(0);
+                .NotEmpty();
 
             RuleFor(x => x.ValueA)
                 .NotEmpty();

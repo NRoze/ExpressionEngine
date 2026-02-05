@@ -24,16 +24,16 @@ namespace ExpressionEngine.Infrastructure.Data
             });
 
             modelBuilder.Entity<Operation>().HasData(
-                new Operation { Id = 1, Name = "Add", Expression = "A + B", OperationType = OperationType.Numeric },
-                new Operation { Id = 2, Name = "Subtract", Expression = "A - B", OperationType = OperationType.Numeric },
-                new Operation { Id = 3, Name = "Multiply", Expression = "A * B", OperationType = OperationType.Numeric },
-                new Operation { Id = 4, Name = "Divide", Expression = "A / B", OperationType = OperationType.Numeric },
-                new Operation { Id = 5, Name = "Modulo", Expression = "A % B", OperationType = OperationType.Numeric },
-                new Operation { Id = 6, Name = "Min", Expression = "min(A,B)", OperationType = OperationType.Numeric },
-                new Operation { Id = 7, Name = "Max", Expression = "max(A,B)", OperationType = OperationType.Numeric },
-                new Operation { Id = 8, Name = "Concat", Expression = "A + B", OperationType = OperationType.String },
-                new Operation { Id = 9, Name = "Remove", Expression = "A - B", OperationType = OperationType.String },
-                new Operation { Id = 10, Name = "Repeat", Expression = "A * B", OperationType = OperationType.String }
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000001"), "Add", "A + B", OperationType.Numeric),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000002"), "Subtract", "A - B", OperationType.Numeric),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000003"), "Multiply", "A * B", OperationType.Numeric),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000004"), "Divide", "A / B", OperationType.Numeric),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000005"), "Modulo", "A % B", OperationType.Numeric),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000006"), "Min", "min(A,B)", OperationType.Numeric),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000007"), "Max", "max(A,B)", OperationType.Numeric),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000008"), "Concat", "A + B", OperationType.String),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-000000000009"), "Remove", "A - B", OperationType.String),
+                new Operation(Guid.Parse("0180b8c0-0000-7e01-8000-00000000000a"), "Repeat", "A * B", OperationType.String)
             );
 
             modelBuilder.Entity<Operator>(entity =>

@@ -24,11 +24,9 @@ namespace ExpressionEngine.Infrastructure.Migrations
 
             modelBuilder.Entity("ExpressionEngine.Core.Models.Operation", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Expression")
                         .IsRequired()
@@ -51,70 +49,70 @@ namespace ExpressionEngine.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000001"),
                             Expression = "A + B",
                             Name = "Add",
                             OperationType = 0
                         },
                         new
                         {
-                            Id = 2,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000002"),
                             Expression = "A - B",
                             Name = "Subtract",
                             OperationType = 0
                         },
                         new
                         {
-                            Id = 3,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000003"),
                             Expression = "A * B",
                             Name = "Multiply",
                             OperationType = 0
                         },
                         new
                         {
-                            Id = 4,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000004"),
                             Expression = "A / B",
                             Name = "Divide",
                             OperationType = 0
                         },
                         new
                         {
-                            Id = 5,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000005"),
                             Expression = "A % B",
                             Name = "Modulo",
                             OperationType = 0
                         },
                         new
                         {
-                            Id = 6,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000006"),
                             Expression = "min(A,B)",
                             Name = "Min",
                             OperationType = 0
                         },
                         new
                         {
-                            Id = 7,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000007"),
                             Expression = "max(A,B)",
                             Name = "Max",
                             OperationType = 0
                         },
                         new
                         {
-                            Id = 8,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000008"),
                             Expression = "A + B",
                             Name = "Concat",
                             OperationType = 1
                         },
                         new
                         {
-                            Id = 9,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-000000000009"),
                             Expression = "A - B",
                             Name = "Remove",
                             OperationType = 1
                         },
                         new
                         {
-                            Id = 10,
+                            Id = new Guid("0180b8c0-0000-7e01-8000-00000000000a"),
                             Expression = "A * B",
                             Name = "Repeat",
                             OperationType = 1
@@ -123,11 +121,9 @@ namespace ExpressionEngine.Infrastructure.Migrations
 
             modelBuilder.Entity("ExpressionEngine.Core.Models.OperationHistory", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("A")
                         .IsRequired()
@@ -140,16 +136,14 @@ namespace ExpressionEngine.Infrastructure.Migrations
                     b.Property<DateTime>("ExecutedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("OperationId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("OperationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Result")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OperationId");
 
                     b.ToTable("OperationHistories");
                 });
@@ -328,17 +322,6 @@ namespace ExpressionEngine.Infrastructure.Migrations
                             Symbol = ",",
                             Type = 4
                         });
-                });
-
-            modelBuilder.Entity("ExpressionEngine.Core.Models.OperationHistory", b =>
-                {
-                    b.HasOne("ExpressionEngine.Core.Models.Operation", "Operation")
-                        .WithMany()
-                        .HasForeignKey("OperationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Operation");
                 });
 #pragma warning restore 612, 618
         }

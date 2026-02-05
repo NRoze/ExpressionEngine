@@ -9,7 +9,7 @@ namespace ExpressionEngine.Api.Validators
         public UpdateOperationValidator(IExpressionValidator expressionValidator)
         {
             RuleFor(x => x.OperationId)
-                .GreaterThanOrEqualTo(0);
+                .NotNull();
 
             RuleFor(x => x.Expression)
                 .NotEmpty()

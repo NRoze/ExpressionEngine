@@ -4,5 +4,5 @@ using System.Text;
 
 namespace ExpressionEngine.Shared.DTOs
 {
-    public record OperationDto(int Id, string Name);
+    public record OperationDto(Guid Id, string Name);
 }

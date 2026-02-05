@@ -51,19 +51,12 @@ public sealed class OperationService : IOperationService
         return await BuildResultDTO(operation.Id, result);
     }
 
-    private async Task LogOperationUsage(int operationId, CalculateRequestDto request, string result)
+    private async Task LogOperationUsage(Guid operationId, CalculateRequestDto request, string result)
     {
-        await _historyRepo.AddAsync(new OperationHistory
-        {
-            OperationId = operationId,
-            A = request.ValueA,
-            B = request.ValueB,
-            Result = result,
-            ExecutedAt = _dateProvider.UtcNow
-        });
+        await _historyRepo.AddAsync(new OperationHistory(operationId, request.ValueA, request.ValueB, result, _dateProvider.UtcNow));
     }
 
-    private async Task<CalculateResultDto> BuildResultDTO(int operationId, string result)
+    private async Task<CalculateResultDto> BuildResultDTO(Guid operationId, string result)
     {
         var dateNow = _dateProvider.UtcNow;
         var history = await _historyRepo.GetAllAsync();//TODO optimize to fetch only relevant records

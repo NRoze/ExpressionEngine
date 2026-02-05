@@ -18,6 +18,11 @@ public class EfRepository<T> : IRepository<T> where T : class
         return await _db.Set<T>().ToListAsync();
     }
 
+    public async Task<T?> GetByIdAsync(Guid id)
+    {
+        return await _db.Set<T>().FindAsync(id);
+    }
+
     public async Task<T?> GetByIdAsync(int id)
     {
         return await _db.Set<T>().FindAsync(id);
@@ -36,6 +41,15 @@ public class EfRepository<T> : IRepository<T> where T : class
     }
 
     public async Task DeleteAsync(int id)
+    {
+        var entity = await GetByIdAsync(id);
+        if (entity == null) return;
+
+        _db.Set<T>().Remove(entity);
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
     {
         var entity = await GetByIdAsync(id);
         if (entity == null) return;

@@ -12,17 +12,12 @@ namespace ExpressionEngine.UnitTests.Services
         public async Task ExecuteAsync_NumericOperation_ParsesValues_LogsAndReturnsResultAndHistory()
         {
             // Arrange
+            var name = $"Op_{Guid.NewGuid()}";
             var now = new DateTime(2026, 2, 5, 12, 0, 0, DateTimeKind.Utc);
-
             var dateProviderMock = new Mock<IDateProvider>();
             dateProviderMock.SetupGet(d => d.UtcNow).Returns(now);
 
-            var operation = new Operation
-            {
-                Id = 1,
-                Expression = "A + B",
-                OperationType = OperationType.Numeric
-            };
+            var operation = new Operation(name, "A + B", OperationType.Numeric);
 
             var repoMock = new Mock<IRepository<Operation>>();
             repoMock.Setup(r => r.GetByIdAsync(operation.Id)).ReturnsAsync(operation);
@@ -37,10 +32,10 @@ namespace ExpressionEngine.UnitTests.Services
             // Prepare history returned by GetAllAsync - 4 items so last3 are top 3 newest
             var histories = new List<OperationHistory>
             {
-                new OperationHistory { OperationId = 1, A = "x", B = "y", Result = "r1", ExecutedAt = now.AddMinutes(-3) },
-                new OperationHistory { OperationId = 1, A = "x", B = "y", Result = "r2", ExecutedAt = now.AddMinutes(-2) },
-                new OperationHistory { OperationId = 1, A = "x", B = "y", Result = "r3", ExecutedAt = now.AddMinutes(-1) },
-                new OperationHistory { OperationId = 1, A = "x", B = "y", Result = "r4", ExecutedAt = now } // newest
+                new OperationHistory(operation.Id, "x", "y", "r1", now.AddMinutes(-3)),
+                new OperationHistory(operation.Id, "x", "y", "r2", now.AddMinutes(-2)),
+                new OperationHistory(operation.Id, "x", "y", "r3", now.AddMinutes(-1)),
+                new OperationHistory(operation.Id, "x", "y", "r4", now) // newest
             };
             // Return unsorted list to ensure service does ordering itself
             historyRepoMock.Setup(h => h.GetAllAsync()).ReturnsAsync(histories);
@@ -76,16 +71,12 @@ namespace ExpressionEngine.UnitTests.Services
         {
             // Arrange
             var now = new DateTime(2026, 2, 5, 12, 0, 0, DateTimeKind.Utc);
+            var name = $"Op_{Guid.NewGuid()}";
 
             var dateProviderMock = new Mock<IDateProvider>();
             dateProviderMock.SetupGet(d => d.UtcNow).Returns(now);
 
-            var operation = new Operation
-            {
-                Id = 2,
-                Expression = "A+B",
-                OperationType = OperationType.String
-            };
+            var operation = new Operation(name, "A+B", OperationType.String);
 
             var repoMock = new Mock<IRepository<Operation>>();
             repoMock.Setup(r => r.GetByIdAsync(operation.Id)).ReturnsAsync(operation);
@@ -138,7 +129,7 @@ namespace ExpressionEngine.UnitTests.Services
 
             var service = new OperationService(dateProviderMock.Object, repoMock.Object, historyRepoMock.Object);
 
-            var request = new CalculateRequestDto(99, "a", "b");
+            var request = new CalculateRequestDto(Guid.NewGuid(), "a", "b");
 
             // Act & Assert
             var ex = await Assert.ThrowsAsync<ArgumentException>(() => service.ExecuteAsync(request));
@@ -150,15 +141,11 @@ namespace ExpressionEngine.UnitTests.Services
         public async Task ExecuteAsync_NumericOperation_InvalidNumericValues_ThrowsArgumentException()
         {
             // Arrange
+            var name = $"Op_{Guid.NewGuid()}";
             var dateProviderMock = new Mock<IDateProvider>();
             dateProviderMock.SetupGet(d => d.UtcNow).Returns(DateTime.UtcNow);
 
-            var operation = new Operation
-            {
-                Id = 3,
-                Expression = "A + B",
-                OperationType = OperationType.Numeric
-            };
+            var operation = new Operation(name, "A + B", OperationType.Numeric);
 
             var repoMock = new Mock<IRepository<Operation>>();
             repoMock.Setup(r => r.GetByIdAsync(operation.Id)).ReturnsAsync(operation);

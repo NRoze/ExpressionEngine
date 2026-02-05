@@ -11,7 +11,7 @@ POST {{ExpressionEngine_HostAddress}}/api/calculate
 Content-Type: application/json
 
 {
-  "operationId": 1,
+  "operationId": "0180b8c0-0000-7e01-8000-000000000001",
   "valueA": "2",
   "valueB": "3"
 }
@@ -85,11 +85,11 @@ PUT {{ExpressionEngine_HostAddress}}/api/operations
 Content-Type: application/json
 
 {
-  "operationId": "21",
+  "operationId": "019c2f06-1fa5-7a57-8c73-b983058f9a9c",
   "expression": "A / (B - B)"
 }
 
 ###
 
 ### Delete valid operation 1
-DELETE {{ExpressionEngine_HostAddress}}/api/operations/21
+DELETE {{ExpressionEngine_HostAddress}}/api/operations/019c2f06-1fa5-7a57-8c73-b983058f9a9c

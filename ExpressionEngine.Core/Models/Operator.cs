@@ -4,9 +4,9 @@ namespace ExpressionEngine.Core.Models
 {
     public class Operator
     {
-        public int Id { get; set; }
-        public string Symbol { get; set; } = null!;
-        public string Name { get; set; } = null!;
-        public OperatorType Category { get; set; }
+        public int Id { get; init; }
+        public string Symbol { get; init; } = default!;
+        public string Name { get; init; } = default!;
+        public OperatorType Category { get; init; }
     }
 }
