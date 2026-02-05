@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ExpressionEngine.Core.Interfaces
+﻿namespace ExpressionEngine.Core.Interfaces
 {
     public interface IDateProvider
     {

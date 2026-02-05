@@ -72,10 +72,9 @@ public sealed class OperationService : IOperationService
                 h.OperationId == operationId &&
                 h.ExecutedAt.Year == dateNow.Year &&
                 h.ExecutedAt.Month == dateNow.Month)
-            .OrderByDescending(h => h.ExecutedAt)
-            .ToList();
+            .OrderByDescending(h => h.ExecutedAt);
         var last3 = thisMonthHistory.Take(3);
-        var count = thisMonthHistory.Count;
+        var count = thisMonthHistory.Count();
 
         return new CalculateResultDto(
             result,

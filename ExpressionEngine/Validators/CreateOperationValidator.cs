@@ -18,7 +18,7 @@ namespace ExpressionEngine.Api.Validators
                 .NotEmpty()
                 .WithMessage("Expression is required")
                 .MaximumLength(500)
-                .WithMessage("Expression cannot exceed 100 characters")
+                .WithMessage("Expression cannot exceed 500 characters")
                 .MustAsync(async (dto, expr, ct) => // CancellationToken is ignored for simplicity in this demo
                     await expressionValidator.ValidateAsync(expr, dto.Type))
                 .WithMessage("Invalid expression format or unsupported tokens");

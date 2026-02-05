@@ -68,7 +68,7 @@ Content-Type: application/json
   "type": 1
 }
 
-### Create nvalid operation 6
+### Create invalid operation 6
 POST {{ExpressionEngine_HostAddress}}/api/operations
 Content-Type: application/json
 

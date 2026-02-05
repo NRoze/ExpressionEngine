@@ -20,14 +20,24 @@ namespace ExpressionEngine.Infrastructure.Validators
             ("x", "3"),
             ("abc", "2"),
             ("A", "B")
-        }; 
-        
+        };
+
+        private readonly List<(string a, int b)> StringCandidatesMultiplication = new()
+        {
+            ("hello ", 2),
+            ("x", 3),
+            ("abc", 4),
+            ("A", 12)
+        };
+
         public bool Validate(string expression, OperationType operationType)
         {
             return operationType switch
             {
                 OperationType.Numeric => ValidateWithNumericEngine(expression),
-                OperationType.String => ValidateWithStringEngine(expression),
+                OperationType.String =>
+                    expression.Contains('*') ? ValidateWithMultiplicationStringEngine(expression)
+                                            : ValidateWithStringEngine(expression),
                 _ => false
             };
         }
@@ -41,10 +51,7 @@ namespace ExpressionEngine.Infrastructure.Validators
                     NumericExpressionEngine.Calculate(expression, a, b);
                     return true;
                 }
-                catch
-                {
-                    // ignore and try next candidate
-                }
+                catch { } // ignore and try next candidate
             }
 
             return false;
@@ -59,13 +66,26 @@ namespace ExpressionEngine.Infrastructure.Validators
                     StringExpressionEngine.Calculate(expression, a, b);
                     return true;
                 }
-                catch
-                {
-                    // ignore and try next candidate
-                }
+                catch { } // ignore and try next candidate
             }
 
             return false;
         }
+
+        private bool ValidateWithMultiplicationStringEngine(string expression)
+        {
+            foreach (var (a, b) in StringCandidates)
+            {
+                try
+                {
+                    StringExpressionEngine.Calculate(expression, a, b);
+                    return true;
+                }
+                catch { } // ignore and try next candidate
+            }
+
+            return false;
+        }
+
     }
 }

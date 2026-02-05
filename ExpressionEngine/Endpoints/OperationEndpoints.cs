@@ -3,7 +3,6 @@ using ExpressionEngine.Core.Interfaces;
 using ExpressionEngine.Core.Models;
 using ExpressionEngine.Shared.DTOs;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ExpressionEngine.Api.Endpoints
 {

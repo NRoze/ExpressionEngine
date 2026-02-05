@@ -7,9 +7,8 @@ using ExpressionEngine.Infrastructure.Repositores;
 using ExpressionEngine.Infrastructure.Services;
 using ExpressionEngine.Infrastructure.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-//TODO add test units
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +30,20 @@ builder.Services.AddScoped<IEndpointDefinition, OperationEndpoints>();
 builder.Services.AddScoped<IOperationService, OperationService>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    ExceptionHandler = async context =>
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsJsonAsync(new ProblemDetails
+        {
+            Title = "Internal Server Error",
+            Status = 500
+        });
+    },
+    SuppressDiagnosticsCallback = _ => true
+});
 
 app.UseCors(MyAllowOrigins);
 using var scope = app.Services.CreateScope();

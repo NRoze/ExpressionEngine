@@ -1,9 +1,7 @@
 ﻿using ExpressionEngine.Core.Interfaces;
-using ExpressionEngine.Infrastructure.Engines;
-using ExpressionEngine.Shared.DTOs;
 using ExpressionEngine.Shared.Enums;
 
-namespace ExpressionEngine.Infrastructure.Services
+namespace ExpressionEngine.Infrastructure.Validators
 {
     public sealed class ExpressionValidator : IExpressionValidator
     {

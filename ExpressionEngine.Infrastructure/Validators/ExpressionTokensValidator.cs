@@ -17,11 +17,11 @@ namespace ExpressionEngine.Infrastructure.Validators
 
         public async Task<bool> ValidateAsync(string expression, OperationType type)
         {
-            var tokens = await _tokenRepo.GetAllAsync();
-            var operators = await _operatorRepo.GetAllAsync();
 
             try
             {
+                var tokens = await _tokenRepo.GetAllAsync();
+                var operators = await _operatorRepo.GetAllAsync();
                 var tokenList = Tokenize(expression, tokens);
 
                 return ValidateTokens(tokenList, tokens, operators, type);
@@ -34,8 +34,9 @@ namespace ExpressionEngine.Infrastructure.Validators
         private IReadOnlyList<string> Tokenize(string expression, IReadOnlyList<Token> tokenDefinitions)
         {
             var tokens = new List<string>();
-
+            var tokensLongToShort = tokenDefinitions.OrderByDescending(t => t.Symbol.Length);
             int i = 0;
+
             while (i < expression.Length)
             {
                 if (char.IsWhiteSpace(expression[i]))
@@ -44,10 +45,9 @@ namespace ExpressionEngine.Infrastructure.Validators
                     continue;
                 }
 
-                // Try match the longest token from tokenDefinitions
                 string? matched = null;
 
-                foreach (var token in tokenDefinitions.OrderByDescending(t => t.Symbol.Length))
+                foreach (var token in tokensLongToShort)
                 {
                     if (expression.Length - i >= token.Symbol.Length &&
                         string.Compare(expression, i, token.Symbol, 0, token.Symbol.Length, true) == 0)
