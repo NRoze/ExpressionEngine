@@ -49,7 +49,6 @@ namespace ExpressionEngine.Api.Endpoints
 
                 return Results.BadRequest($"Failed to create {request.Name} operation");
             }
-
         }
 
         private async Task<IResult> UpdateOperation(

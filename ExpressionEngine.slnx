@@ -3,6 +3,10 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="ExpressionEngine.IntegrationTests/ExpressionEngine.IntegrationTests.csproj" Id="abd6985d-98a4-46f3-8320-d1019d8d3a48" />
+    <Project Path="ExpressionEngine.UnitTests/ExpressionEngine.UnitTests.csproj" Id="843c00a8-0063-4d42-ae9d-f5172c31ceb4" />
+  </Folder>
   <Project Path="ExpressionEngine.Core/ExpressionEngine.Core.csproj" />
   <Project Path="ExpressionEngine.Infrastructure/ExpressionEngine.Infrastructure.csproj" />
   <Project Path="ExpressionEngine.Shared/ExpressionEngine.Shared.csproj" />
