@@ -3,6 +3,7 @@ using ExpressionEngine.Core.Models;
 using ExpressionEngine.Infrastructure.Engines;
 using ExpressionEngine.Shared.DTOs;
 using ExpressionEngine.Shared.Enums;
+using Microsoft.EntityFrameworkCore;
 
 public sealed class OperationService : IOperationService
 {
@@ -59,19 +60,30 @@ public sealed class OperationService : IOperationService
     private async Task<CalculateResultDto> BuildResultDTO(Guid operationId, string result)
     {
         var dateNow = _dateProvider.UtcNow;
-        var history = await _historyRepo.GetAllAsync();//TODO optimize to fetch only relevant records
-        var thisMonthHistory = history
-            .Where(h => 
-                h.OperationId == operationId &&
-                h.ExecutedAt.Year == dateNow.Year &&
-                h.ExecutedAt.Month == dateNow.Month)
-            .OrderByDescending(h => h.ExecutedAt);
-        var last3 = thisMonthHistory.Take(3);
-        var count = thisMonthHistory.Count();
+        var start = new DateTime(dateNow.Year, dateNow.Month, 1);
+        var historyQuery = _historyRepo.Query()
+            .Where(h => h.OperationId == operationId)
+            .Where(h => h.ExecutedAt >= start && h.ExecutedAt <= dateNow)
+            .OrderByDescending(h => h.ExecutedAt)
+            .Select(h => new OperationHistoryDto(h.A, h.B, h.Result));
 
-        return new CalculateResultDto(
-            result,
-            [.. last3.Select(h => new OperationHistoryDto(h.A, h.B, h.Result))],
-            count);
+        List<OperationHistoryDto> last3List;
+        int count;
+
+        // If the IQueryable supports EF Core async enumeration, use async methods.
+        // Otherwise fall back to synchronous enumeration (works for mocks/AsQueryable()).
+        if (historyQuery is IAsyncEnumerable<OperationHistory>)
+        {
+            last3List = await historyQuery.Take(3).ToListAsync();
+            count = await historyQuery.CountAsync();
+        }
+        else
+        {
+            var all = historyQuery.ToList();
+            last3List = all.Take(3).ToList();
+            count = all.Count;
+        }
+
+        return new CalculateResultDto(result, last3List, count);
     }
 }

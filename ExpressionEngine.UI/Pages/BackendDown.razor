@@ -1,0 +1,50 @@
+﻿@using ExpressionEngine.UI.Services
+<div class="container text-center mt-5">
+    <div class="container text-center mt-5">
+        <h2>🚨 Backend unavailable</h2>
+
+        <p>@Message</p>
+
+        @if (!IsRetrying)
+        {
+            <button class="btn btn-primary" @onclick="Retry">
+                Retry connection
+            </button>
+        }
+        else
+        {
+            <div class="text-muted">
+                🔄 Retrying…
+            </div>
+        }
+    </div>
+
+</div>
+@code {
+    [Inject] HttpClient Http { get; set; } = default!;
+    [Inject] BackendStatus Backend { get; set; } = default!;
+
+    private bool IsRetrying;
+    private string Message = "The server is not running or cannot be reached.";
+
+    private async Task Retry()
+    {
+        IsRetrying = true;
+        Message = "Trying to reconnect to the server…";
+        StateHasChanged();
+
+        try
+        {
+            await Http.GetAsync("health");
+            Backend.MarkUp();
+        }
+        catch
+        {
+            Message = "Still can't reach the server. Make sure it is running.";
+        }
+        finally
+        {
+            IsRetrying = false;
+        }
+    }
+}

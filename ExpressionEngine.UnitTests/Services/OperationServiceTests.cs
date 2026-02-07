@@ -29,7 +29,7 @@ namespace ExpressionEngine.UnitTests.Services
                 .Callback<OperationHistory>(h => addedHistory = h)
                 .Returns(Task.CompletedTask);
 
-            // Prepare history returned by GetAllAsync - 4 items so last3 are top 3 newest
+            // Prepare history returned by Query() - 4 items so last3 are top 3 newest
             var histories = new List<OperationHistory>
             {
                 new OperationHistory(operation.Id, "x", "y", "r1", now.AddMinutes(-3)),
@@ -37,8 +37,8 @@ namespace ExpressionEngine.UnitTests.Services
                 new OperationHistory(operation.Id, "x", "y", "r3", now.AddMinutes(-1)),
                 new OperationHistory(operation.Id, "x", "y", "r4", now) // newest
             };
-            // Return unsorted list to ensure service does ordering itself
-            historyRepoMock.Setup(h => h.GetAllAsync()).ReturnsAsync(histories);
+            // Return unsorted IQueryable to ensure service does ordering itself
+            historyRepoMock.Setup(h => h.Query()).Returns(histories.AsQueryable());
 
             var service = new OperationService(dateProviderMock.Object, repoMock.Object, historyRepoMock.Object);
 
@@ -63,7 +63,7 @@ namespace ExpressionEngine.UnitTests.Services
 
             historyRepoMock.Verify(h => h.AddAsync(It.IsAny<OperationHistory>()), Times.Once);
             repoMock.Verify(r => r.GetByIdAsync(operation.Id), Times.Once);
-            historyRepoMock.Verify(h => h.GetAllAsync(), Times.Once);
+            historyRepoMock.Verify(h => h.Query(), Times.Once);
         }
 
         [Fact]
@@ -86,10 +86,10 @@ namespace ExpressionEngine.UnitTests.Services
             historyRepoMock
                 .Setup(h => h.AddAsync(It.IsAny<OperationHistory>()))
                 .Callback<OperationHistory>(h => addedHistory = h)
-                .Returns(Task.CompletedTask);
+                .Returns(Task.CompletedTask);       
 
-            // Return an empty list for existing history
-            historyRepoMock.Setup(h => h.GetAllAsync()).ReturnsAsync(new List<OperationHistory>());
+            // Return an empty IQueryable for existing history
+            historyRepoMock.Setup(h => h.Query()).Returns(new List<OperationHistory>().AsQueryable());
 
             var service = new OperationService(dateProviderMock.Object, repoMock.Object, historyRepoMock.Object);
 

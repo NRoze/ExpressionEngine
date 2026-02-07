@@ -1,5 +1,5 @@
 ﻿using ExpressionEngine.Core.Models;
-using ExpressionEngine.Infrastructure.Data;
+using ExpressionEngine.Infrastructure;
 using ExpressionEngine.Infrastructure.Repositores;
 using ExpressionEngine.Shared.Enums;
 using Microsoft.EntityFrameworkCore;

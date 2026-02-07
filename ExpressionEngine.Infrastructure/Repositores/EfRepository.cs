@@ -1,5 +1,4 @@
 ﻿using ExpressionEngine.Core.Interfaces;
-using ExpressionEngine.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpressionEngine.Infrastructure.Repositores;
@@ -11,6 +10,11 @@ public class EfRepository<T> : IRepository<T> where T : class
     public EfRepository(AppDbContext db)
     {
         _db = db;
+    }
+
+    public IQueryable<T> Query()
+    {
+        return _db.Set<T>().AsNoTracking();
     }
 
     public async Task<List<T>> GetAllAsync()

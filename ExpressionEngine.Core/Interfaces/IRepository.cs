@@ -2,6 +2,7 @@
 {
     public interface IRepository<T>
     {
+        IQueryable<T> Query();
         Task<List<T>> GetAllAsync();
         Task<T?> GetByIdAsync(Guid id);
         Task<T?> GetByIdAsync(int id);

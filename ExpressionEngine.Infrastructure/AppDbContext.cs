@@ -2,7 +2,7 @@
 using ExpressionEngine.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace ExpressionEngine.Infrastructure.Data
+namespace ExpressionEngine.Infrastructure
 {
     public class AppDbContext : DbContext
     {

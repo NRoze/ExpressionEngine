@@ -3,6 +3,7 @@ using ExpressionEngine.Core.Interfaces;
 using ExpressionEngine.Core.Models;
 using ExpressionEngine.Shared.DTOs;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExpressionEngine.Api.Endpoints
 {
@@ -25,8 +26,9 @@ namespace ExpressionEngine.Api.Endpoints
         {
             try
             {
-                if (!(await validator.ValidateAsync(request)).IsValid)
-                    return Results.BadRequest("Invalid request");
+                var result = await validator.ValidateAsync(request);
+                if (!result.IsValid)
+                    return Results.ValidationProblem(result.ToDictionary());
 
                 var operation = new Operation(request.Name, request.Expression, request.Type);
 
@@ -42,7 +44,7 @@ namespace ExpressionEngine.Api.Endpoints
                     request.Name,
                     request.Expression);
 
-                return Results.BadRequest($"Failed to create {request.Name} operation");
+                return Results.Problem($"Failed to create {request.Name} operation");
             }
         }
 
@@ -60,8 +62,9 @@ namespace ExpressionEngine.Api.Endpoints
             try
             {
                 request.Type = operation.OperationType;
-                if (!(await validator.ValidateAsync(request)).IsValid)
-                    return Results.BadRequest("Invalid request");
+                var result = await validator.ValidateAsync(request);
+                if (!result.IsValid)
+                    return Results.ValidationProblem(result.ToDictionary());
 
                 operation.UpdateExpression(request.Expression);
 
@@ -77,7 +80,7 @@ namespace ExpressionEngine.Api.Endpoints
                     operation.Name,
                     request.Expression);
 
-                return Results.BadRequest($"Failed to updtae {operation.Name} operation");
+                return Results.Problem($"Failed to updtae {operation.Name} operation");
             }
         }
 
@@ -100,17 +103,17 @@ namespace ExpressionEngine.Api.Endpoints
                     "Error deleting operation id {OperationId}",
                     operationId);
 
-                return Results.BadRequest($"Failed to delete operation id {operationId} ");
+                return Results.Problem($"Failed to delete operation id {operationId} ");
             }
         }
 
         private async Task<IResult> GetOperations(IRepository<Operation> repo)
         {
-            var operations = await repo.GetAllAsync();
+            var operations = await repo.Query()
+                .Select(o => new OperationDto(o.Id, o.Name))
+                .ToListAsync();
 
-            if (operations is null) return Results.Empty;
-
-            return Results.Ok(operations.Select(o => new OperationDto(o.Id, o.Name)).ToList());
+            return Results.Ok(operations);
         }
 
         private async Task<IResult> CalculateOperation(
@@ -121,8 +124,9 @@ namespace ExpressionEngine.Api.Endpoints
         {
             try
             {
-                if (!(await validator.ValidateAsync(request)).IsValid)
-                    return Results.BadRequest("Invalid request");
+                var validationRresult = await validator.ValidateAsync(request);
+                if (!validationRresult.IsValid)
+                    return Results.ValidationProblem(validationRresult.ToDictionary());
 
                 var result = await operationService.ExecuteAsync(request);
 
@@ -138,7 +142,7 @@ namespace ExpressionEngine.Api.Endpoints
                     request.ValueA,
                     request.ValueB);
 
-                return Results.BadRequest(ex.Message);
+                return Results.Problem($"Failed to calculate operation id {request.OperationId}");
             }
         }
     }

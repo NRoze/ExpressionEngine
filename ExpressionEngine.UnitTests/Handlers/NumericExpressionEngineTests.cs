@@ -19,7 +19,7 @@ namespace ExpressionEngine.UnitTests.Handlers
             var mi = GetCalculateMethod();
 
             var ex = Assert.Throws<TargetInvocationException>(() =>
-                mi.Invoke(null, new object[] { expression, 1.0, 2.0 }));
+                mi.Invoke(null, [expression, 1.0, 2.0]));
 
             Assert.IsType<ArgumentException>(ex.InnerException);
             var argEx = (ArgumentException)ex.InnerException!;
@@ -31,7 +31,7 @@ namespace ExpressionEngine.UnitTests.Handlers
         {
             var mi = GetCalculateMethod();
 
-            var result = mi.Invoke(null, new object[] { "A + B", 1.5, 2.25 }) as string;
+            var result = mi.Invoke(null, ["A + B", 1.5, 2.25]) as string;
 
             Assert.NotNull(result);
             var value = double.Parse(result!, CultureInfo.InvariantCulture);
@@ -47,7 +47,7 @@ namespace ExpressionEngine.UnitTests.Handlers
         {
             var mi = GetCalculateMethod();
 
-            var result = mi.Invoke(null, new object[] { expression, a, b }) as string;
+            var result = mi.Invoke(null, [expression, a, b]) as string;
 
             Assert.NotNull(result);
             var value = double.Parse(result!, CultureInfo.InvariantCulture);
@@ -60,7 +60,7 @@ namespace ExpressionEngine.UnitTests.Handlers
             var mi = GetCalculateMethod();
 
             // max(4,6)=6 -> 6*2 = 12 ; min(4,6)=4 -> 4/2 = 2 ; total = 14
-            var result = mi.Invoke(null, new object[] { "max(A,B) * 2 + min(A,B) / 2", 4.0, 6.0 }) as string;
+            var result = mi.Invoke(null, ["max(A,B) * 2 + min(A,B) / 2", 4.0, 6.0]) as string;
 
             Assert.NotNull(result);
             var value = double.Parse(result!, CultureInfo.InvariantCulture);

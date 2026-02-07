@@ -6,29 +6,29 @@ namespace ExpressionEngine.Infrastructure.Validators
 {
     public sealed class ExpressionFormatValidator : IExpressionFormatValidator
     {
-        private readonly List<(double a, double b)> NumericCandidates = new()
-        {
+        private readonly List<(double a, double b)> NumericCandidates =
+        [
             (2, 3),
             (10, 5),
             (7, 2),
             (4, 1)
-        };
+        ];
 
-        private readonly List<(string a, string b)> StringCandidates = new()
-        {
+        private readonly List<(string a, string b)> StringCandidates =
+        [
             ("hello ", "world"),
             ("x", "3"),
             ("abc", "2"),
             ("A", "B")
-        };
+        ];
 
-        private readonly List<(string a, int b)> StringCandidatesMultiplication = new()
-        {
-            ("hello ", 2),
-            ("x", 3),
-            ("abc", 4),
-            ("A", 12)
-        };
+        private readonly List<(string a, string b)> StringCandidatesMultiplication =
+        [
+            ("hello ", "2"),
+            ("x", "3"),
+            ("abc", "4"),
+            ("A", "12")
+        ];
 
         public bool Validate(string expression, OperationType operationType)
         {
@@ -74,7 +74,7 @@ namespace ExpressionEngine.Infrastructure.Validators
 
         private bool ValidateWithMultiplicationStringEngine(string expression)
         {
-            foreach (var (a, b) in StringCandidates)
+            foreach (var (a, b) in StringCandidatesMultiplication)
             {
                 try
                 {
