@@ -14,8 +14,8 @@ namespace ExpressionEngine.UnitTests.Handlers
         {
             var mockExprValidator = new Mock<IExpressionValidator>();
             mockExprValidator
-                .Setup(x => x.ValidateAsync(It.IsAny<string>(), It.IsAny<OperationType>()))
-                .ReturnsAsync(true);
+                .Setup(x => x.Validate(It.IsAny<string>(), It.IsAny<OperationType>()))
+                .Returns(true);
 
             var sut = new CreateOperationValidator(mockExprValidator.Object);
 
@@ -24,7 +24,7 @@ namespace ExpressionEngine.UnitTests.Handlers
             var result = await sut.ValidateAsync(dto);
 
             Assert.True(result.IsValid);
-            mockExprValidator.Verify(x => x.ValidateAsync("A + B", OperationType.Numeric), Times.Once);
+            mockExprValidator.Verify(x => x.Validate("A + B", OperationType.Numeric), Times.Once);
         }
 
         [Theory]
@@ -35,8 +35,8 @@ namespace ExpressionEngine.UnitTests.Handlers
         {
             var mockExprValidator = new Mock<IExpressionValidator>();
             mockExprValidator
-                .Setup(x => x.ValidateAsync(It.IsAny<string>(), It.IsAny<OperationType>()))
-                .ReturnsAsync(true);
+                .Setup(x => x.Validate(It.IsAny<string>(), It.IsAny<OperationType>()))
+                .Returns(true);
 
             var sut = new CreateOperationValidator(mockExprValidator.Object);
 
@@ -53,8 +53,8 @@ namespace ExpressionEngine.UnitTests.Handlers
         public async Task CreateOperationValidator_NameTooLong_FailsValidation()
         {
             var mockExprValidator = new Mock<IExpressionValidator>();
-            mockExprValidator.Setup(x => x.ValidateAsync(It.IsAny<string>(), It.IsAny<OperationType>()))
-                             .ReturnsAsync(true);
+            mockExprValidator.Setup(x => x.Validate(It.IsAny<string>(), It.IsAny<OperationType>()))
+                             .Returns(true);
 
             var sut = new CreateOperationValidator(mockExprValidator.Object);
 
@@ -75,8 +75,8 @@ namespace ExpressionEngine.UnitTests.Handlers
         public async Task CreateOperationValidator_ExpressionEmpty_FailsValidation(string expr)
         {
             var mockExprValidator = new Mock<IExpressionValidator>();
-            mockExprValidator.Setup(x => x.ValidateAsync(It.IsAny<string>(), It.IsAny<OperationType>()))
-                             .ReturnsAsync(true);
+            mockExprValidator.Setup(x => x.Validate(It.IsAny<string>(), It.IsAny<OperationType>()))
+                             .Returns(true);
 
             var sut = new CreateOperationValidator(mockExprValidator.Object);
 
@@ -93,8 +93,8 @@ namespace ExpressionEngine.UnitTests.Handlers
         public async Task CreateOperationValidator_ExpressionTooLong_FailsValidation()
         {
             var mockExprValidator = new Mock<IExpressionValidator>();
-            mockExprValidator.Setup(x => x.ValidateAsync(It.IsAny<string>(), It.IsAny<OperationType>()))
-                             .ReturnsAsync(true);
+            mockExprValidator.Setup(x => x.Validate(It.IsAny<string>(), It.IsAny<OperationType>()))
+                             .Returns(true);
 
             var sut = new CreateOperationValidator(mockExprValidator.Object);
 
@@ -113,8 +113,8 @@ namespace ExpressionEngine.UnitTests.Handlers
         {
             var mockExprValidator = new Mock<IExpressionValidator>();
             mockExprValidator
-                .Setup(x => x.ValidateAsync(It.IsAny<string>(), It.IsAny<OperationType>()))
-                .ReturnsAsync(false);
+                .Setup(x => x.Validate(It.IsAny<string>(), It.IsAny<OperationType>()))
+                .Returns(false);
 
             var sut = new CreateOperationValidator(mockExprValidator.Object);
 
@@ -126,7 +126,7 @@ namespace ExpressionEngine.UnitTests.Handlers
             var exprErrors = result.Errors.Where(e => e.PropertyName == "Expression").ToList();
             Assert.Contains(exprErrors, e => e.ErrorMessage == "Invalid expression format or unsupported tokens");
 
-            mockExprValidator.Verify(x => x.ValidateAsync("A + B", OperationType.Numeric), Times.Once);
+            mockExprValidator.Verify(x => x.Validate("A + B", OperationType.Numeric), Times.Once);
         }
     }
 }

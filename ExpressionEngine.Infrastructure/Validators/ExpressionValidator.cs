@@ -15,12 +15,12 @@ namespace ExpressionEngine.Infrastructure.Validators
             _formatValidator = formatValidator;
         }
 
-        public async Task<bool> ValidateAsync(string expression, OperationType type)
+        public bool Validate(string expression, OperationType type)
         {
             if (string.IsNullOrWhiteSpace(expression))
                 return false;
 
-            if (!await _tokensValidator.ValidateAsync(expression, type))
+            if (!_tokensValidator.Validate(expression, type))
                 return false;
 
             if (!_formatValidator.Validate(expression, type))

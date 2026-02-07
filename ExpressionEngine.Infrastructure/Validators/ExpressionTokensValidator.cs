@@ -1,40 +1,53 @@
 ﻿using ExpressionEngine.Core.Interfaces;
 using ExpressionEngine.Core.Models;
 using ExpressionEngine.Shared.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace ExpressionEngine.Infrastructure.Validators
 {
     public sealed class ExpressionTokensValidator : IExpressionTokensValidator
     {
-        private readonly IRepository<Token> _tokenRepo;
-        private readonly IRepository<Operator> _operatorRepo;
+        private readonly ILogger<ExpressionTokensValidator> _logger;
+        private readonly IReadOnlyList<Token> _tokensLongToShort;
+        private readonly Dictionary<string, Token> _tokens;
+        private readonly Dictionary<string, Operator> _operators;
 
-        public ExpressionTokensValidator(IRepository<Token> tokenRepo, IRepository<Operator> operatorRepo)
+        public ExpressionTokensValidator(
+            ILogger<ExpressionTokensValidator> logger,
+            IRepository<Token> tokenRepo, 
+            IRepository<Operator> operatorRepo)
         {
-            _tokenRepo = tokenRepo;
-            _operatorRepo = operatorRepo;
+            _logger = logger;
+
+            var tokens = tokenRepo.Query().ToArray();
+
+            _tokensLongToShort = [.. tokens.OrderByDescending(t => t.Symbol.Length)];
+            _tokens = tokens.ToDictionary(t => t.Symbol, StringComparer.OrdinalIgnoreCase);
+
+            _operators = operatorRepo.Query()
+                .ToDictionary(o => o.Symbol, StringComparer.OrdinalIgnoreCase);
         }
 
-        public async Task<bool> ValidateAsync(string expression, OperationType type)
+        public bool Validate(string expression, OperationType type)
         {
-
             try
             {
-                var tokens = await _tokenRepo.GetAllAsync();
-                var operators = await _operatorRepo.GetAllAsync();
-                var tokenList = Tokenize(expression, tokens);
+                if (!TryTokenize(expression, out var tokenList))
+                    return false;
 
-                return ValidateTokens(tokenList, tokens, operators, type);
+                return ValidateTokens(tokenList, type);
             }
-            catch (FormatException) { }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Error validating expression tokens for expression: {Expression}", expression);
+            }
 
             return false;
         }
 
-        private IReadOnlyList<string> Tokenize(string expression, IReadOnlyList<Token> tokenDefinitions)
+        private bool TryTokenize(ReadOnlySpan<char> expression, out List<string> tokenList)
         {
-            var tokens = new List<string>();
-            var tokensLongToShort = tokenDefinitions.OrderByDescending(t => t.Symbol.Length);
+            tokenList = new List<string>(expression.Length);
             int i = 0;
 
             while (i < expression.Length)
@@ -47,10 +60,11 @@ namespace ExpressionEngine.Infrastructure.Validators
 
                 string? matched = null;
 
-                foreach (var token in tokensLongToShort)
+                foreach (var token in _tokensLongToShort)
                 {
                     if (expression.Length - i >= token.Symbol.Length &&
-                        string.Compare(expression, i, token.Symbol, 0, token.Symbol.Length, true) == 0)
+                        expression.Slice(i, token.Symbol.Length)
+                                    .Equals(token.Symbol, StringComparison.OrdinalIgnoreCase))
                     {
                         matched = token.Symbol;
                         break;
@@ -58,32 +72,29 @@ namespace ExpressionEngine.Infrastructure.Validators
                 }
 
                 if (matched == null)
-                    throw new FormatException($"Unknown token at position {i}");
+                    return false;
 
-                tokens.Add(matched);
+                tokenList.Add(matched);
                 i += matched.Length;
             }
 
-            return tokens;
+            return true;
         }
+
         private bool ValidateTokens(
             IReadOnlyList<string> tokens,
-            IReadOnlyList<Token> tokenDefinitions,
-            IReadOnlyList<Operator> operatorDefinitions,
             OperationType operationType)
         {
             foreach (var token in tokens)
             {
-                var def = tokenDefinitions.FirstOrDefault(t =>
-                    string.Equals(t.Symbol, token, StringComparison.OrdinalIgnoreCase));
-
-                if (def == null)
+                if (!_tokens.TryGetValue(token, out var def))
                     return false;
 
                 if (def.Type == TokenType.Operator ||
                     def.Type == TokenType.Function)
                 {
-                    var op = operatorDefinitions.First(o => o.Symbol == def.Symbol);
+                    if (!_operators.TryGetValue(def.Symbol, out var op))
+                        return false;
 
                     if (operationType == OperationType.String &&
                         op.Category == OperatorType.NumericOnly)
@@ -95,6 +106,5 @@ namespace ExpressionEngine.Infrastructure.Validators
 
             return true;
         }
-
     }
 }

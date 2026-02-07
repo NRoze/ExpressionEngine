@@ -7,6 +7,6 @@ namespace ExpressionEngine.Core.Interfaces
 {
     public interface IExpressionValidator
     {
-        Task<bool> ValidateAsync(string expression, OperationType type);
+        bool Validate(string expression, OperationType type);
     }
 }

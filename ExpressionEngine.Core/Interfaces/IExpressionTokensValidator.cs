@@ -8,6 +8,6 @@ namespace ExpressionEngine.Core.Interfaces
 {
     public interface IExpressionTokensValidator
     {
-        Task<bool> ValidateAsync(string expression, OperationType type);
+        bool Validate(string expression, OperationType type);
     }
 }
