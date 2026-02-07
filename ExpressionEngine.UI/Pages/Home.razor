@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using ExpressionEngine.Shared.DTOs
+@using System.Text.Json
 @inject HttpClient Http
 
 <h3>Expression Engine</h3>
@@ -82,28 +83,77 @@
                 ValueB = InputB
             });
 
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                Error = await response.Content.ReadAsStringAsync();
-                Result = default!;
-                TotalCount = default!;
-                History.Clear();
-
+                var calcResult = await response.Content.ReadFromJsonAsync<CalculateResultDto>();
+                Result = calcResult!.Result;
+                History = calcResult.LastOperations;
+                TotalCount = calcResult.TotalCount;
                 return;
             }
 
-            var calcResult = await response.Content.ReadFromJsonAsync<CalculateResultDto>();
+            Error = await GetReadableError(response);
+            // if (!response.IsSuccessStatusCode)
+            // {
+            //     Error = await GetReadableError(response);
+            //     Result = default!;
+            //     TotalCount = default!;
+            //     History.Clear();
 
-            if (calcResult is not null)
-            {
-                Result = calcResult.Result;
-                History = calcResult.LastOperations;
-                TotalCount = calcResult.TotalCount;
-            }
+            //     return;
+            // }
+
+            // var calcResult = await response.Content.ReadFromJsonAsync<CalculateResultDto>();
+
+            // if (calcResult is not null)
+            // {
+            //     Result = calcResult.Result;
+            //     History = calcResult.LastOperations;
+            //     TotalCount = calcResult.TotalCount;
+            // }
         }
         catch
         {
             Error = "An unexpected error occurred. Please try again.";
         }
     }
+
+    private static async Task<string> GetReadableError(HttpResponseMessage response)
+    {
+        var json = await response.Content.ReadAsStringAsync();
+
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+
+            // 1. Look for "errors" (validation errors)
+            if (doc.RootElement.TryGetProperty("errors", out var errors))
+            {
+                var messages = new List<string>();
+
+                foreach (var prop in errors.EnumerateObject())
+                {
+                    foreach (var msg in prop.Value.EnumerateArray())
+                    {
+                        messages.Add(msg.GetString() ?? "");
+                    }
+                }
+
+                return string.Join("\n", messages);
+            }
+
+            // 2. Look for "title" (ProblemDetails)
+            if (doc.RootElement.TryGetProperty("title", out var title))
+            {
+                return title.GetString() ?? "An error occurred";
+            }
+
+            return "An error occurred";
+        }
+        catch
+        {
+            return "An error occurred";
+        }
+    }
+
 }
