@@ -14,11 +14,9 @@ namespace ExpressionEngine.Api.Validators
                 .NotEmpty();
 
             RuleFor(x => x.ValueA)
-                .NotNull()
                 .NotEmpty();
 
             RuleFor(x => x.ValueB)
-                .NotNull()
                 .NotEmpty();
 
             RuleFor(x => x)
