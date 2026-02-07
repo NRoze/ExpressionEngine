@@ -61,28 +61,15 @@ public sealed class OperationService : IOperationService
     {
         var dateNow = _dateProvider.UtcNow;
         var start = new DateTime(dateNow.Year, dateNow.Month, 1);
+
         var historyQuery = _historyRepo.Query()
             .Where(h => h.OperationId == operationId)
             .Where(h => h.ExecutedAt >= start && h.ExecutedAt <= dateNow)
             .OrderByDescending(h => h.ExecutedAt)
             .Select(h => new OperationHistoryDto(h.A, h.B, h.Result));
 
-        List<OperationHistoryDto> last3List;
-        int count;
-
-        // If the IQueryable supports EF Core async enumeration, use async methods.
-        // Otherwise fall back to synchronous enumeration (works for mocks/AsQueryable()).
-        if (historyQuery is IAsyncEnumerable<OperationHistory>)
-        {
-            last3List = await historyQuery.Take(3).ToListAsync();
-            count = await historyQuery.CountAsync();
-        }
-        else
-        {
-            var all = historyQuery.ToList();
-            last3List = all.Take(3).ToList();
-            count = all.Count;
-        }
+        var last3List = await historyQuery.Take(3).ToListAsync();
+        var count = await historyQuery.CountAsync();
 
         return new CalculateResultDto(result, last3List, count);
     }

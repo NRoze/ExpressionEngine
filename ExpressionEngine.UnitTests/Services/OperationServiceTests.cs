@@ -2,6 +2,8 @@
 using ExpressionEngine.Core.Models;
 using ExpressionEngine.Shared.DTOs;
 using ExpressionEngine.Shared.Enums;
+using ExpressionEngine.UnitTests.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace ExpressionEngine.UnitTests.Services
@@ -22,23 +24,20 @@ namespace ExpressionEngine.UnitTests.Services
             var repoMock = new Mock<IRepository<Operation>>();
             repoMock.Setup(r => r.GetByIdAsync(operation.Id)).ReturnsAsync(operation);
 
-            OperationHistory? addedHistory = null;
-            var historyRepoMock = new Mock<IRepository<OperationHistory>>();
-            historyRepoMock
-                .Setup(h => h.AddAsync(It.IsAny<OperationHistory>()))
-                .Callback<OperationHistory>(h => addedHistory = h)
-                .Returns(Task.CompletedTask);
+            // History capture
+            var (historyRepoMock, addedHistoryCapture) = InMemoryContextHelpers.CreateHistoryRepo();
 
             // Prepare history returned by Query() - 4 items so last3 are top 3 newest
             var histories = new List<OperationHistory>
             {
-                new OperationHistory(operation.Id, "x", "y", "r1", now.AddMinutes(-3)),
-                new OperationHistory(operation.Id, "x", "y", "r2", now.AddMinutes(-2)),
-                new OperationHistory(operation.Id, "x", "y", "r3", now.AddMinutes(-1)),
-                new OperationHistory(operation.Id, "x", "y", "r4", now) // newest
+                new (operation.Id, "x", "y", "r1", now.AddMinutes(-3)),
+                new (operation.Id, "x", "y", "r2", now.AddMinutes(-2)),
+                new (operation.Id, "x", "y", "r3", now.AddMinutes(-1)),
+                new (operation.Id, "x", "y", "r4", now) // newest
             };
-            // Return unsorted IQueryable to ensure service does ordering itself
-            historyRepoMock.Setup(h => h.Query()).Returns(histories.AsQueryable());
+
+            using var context = InMemoryContextHelpers.CreateInMemoryContext(histories);
+            historyRepoMock.Setup(h => h.Query()).Returns(context.OperationHistories);
 
             var service = new OperationService(dateProviderMock.Object, repoMock.Object, historyRepoMock.Object);
 
@@ -49,17 +48,16 @@ namespace ExpressionEngine.UnitTests.Services
 
             // Assert
             Assert.NotNull(resultDto);
-            Assert.Equal("3", resultDto.Result); // 1 + 2 == 3
-            Assert.Equal(3, resultDto.LastOperations.Count); // last 3
-            Assert.Equal(4, resultDto.TotalCount); // total matching this month
+            Assert.Equal("3", resultDto.Result);
+            Assert.Equal(3, resultDto.LastOperations.Count);
+            Assert.Equal(4, resultDto.TotalCount);
 
-            // Verify history was logged with expected values
-            Assert.NotNull(addedHistory);
-            Assert.Equal(operation.Id, addedHistory.OperationId);
-            Assert.Equal("1", addedHistory.A);
-            Assert.Equal("2", addedHistory.B);
-            Assert.Equal("3", addedHistory.Result);
-            Assert.Equal(now, addedHistory.ExecutedAt);
+            Assert.NotNull(addedHistoryCapture.Value);
+            Assert.Equal(operation.Id, addedHistoryCapture.Value.OperationId);
+            Assert.Equal("1", addedHistoryCapture.Value.A);
+            Assert.Equal("2", addedHistoryCapture.Value.B);
+            Assert.Equal("3", addedHistoryCapture.Value.Result);
+            Assert.Equal(now, addedHistoryCapture.Value.ExecutedAt);
 
             historyRepoMock.Verify(h => h.AddAsync(It.IsAny<OperationHistory>()), Times.Once);
             repoMock.Verify(r => r.GetByIdAsync(operation.Id), Times.Once);
@@ -81,15 +79,11 @@ namespace ExpressionEngine.UnitTests.Services
             var repoMock = new Mock<IRepository<Operation>>();
             repoMock.Setup(r => r.GetByIdAsync(operation.Id)).ReturnsAsync(operation);
 
-            OperationHistory? addedHistory = null;
-            var historyRepoMock = new Mock<IRepository<OperationHistory>>();
-            historyRepoMock
-                .Setup(h => h.AddAsync(It.IsAny<OperationHistory>()))
-                .Callback<OperationHistory>(h => addedHistory = h)
-                .Returns(Task.CompletedTask);       
+            // History capture
+            var (historyRepoMock, addedHistoryCapture) = InMemoryContextHelpers.CreateHistoryRepo();
 
-            // Return an empty IQueryable for existing history
-            historyRepoMock.Setup(h => h.Query()).Returns(new List<OperationHistory>().AsQueryable());
+            using var context = InMemoryContextHelpers.CreateInMemoryContext();
+            historyRepoMock.Setup(h => h.Query()).Returns(context.OperationHistories);
 
             var service = new OperationService(dateProviderMock.Object, repoMock.Object, historyRepoMock.Object);
 
@@ -104,12 +98,12 @@ namespace ExpressionEngine.UnitTests.Services
             Assert.Empty(resultDto.LastOperations);
             Assert.Equal(0, resultDto.TotalCount);
 
-            Assert.NotNull(addedHistory);
-            Assert.Equal(operation.Id, addedHistory.OperationId);
-            Assert.Equal("foo", addedHistory.A);
-            Assert.Equal("bar", addedHistory.B);
-            Assert.Equal("foobar", addedHistory.Result);
-            Assert.Equal(now, addedHistory.ExecutedAt);
+            Assert.NotNull(addedHistoryCapture.Value);
+            Assert.Equal(operation.Id, addedHistoryCapture.Value.OperationId);
+            Assert.Equal("foo", addedHistoryCapture.Value.A);
+            Assert.Equal("bar", addedHistoryCapture.Value.B);
+            Assert.Equal("foobar", addedHistoryCapture.Value.Result);
+            Assert.Equal(now, addedHistoryCapture.Value.ExecutedAt);
 
             historyRepoMock.Verify(h => h.AddAsync(It.IsAny<OperationHistory>()), Times.Once);
             repoMock.Verify(r => r.GetByIdAsync(operation.Id), Times.Once);
